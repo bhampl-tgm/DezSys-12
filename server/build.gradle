@@ -1,0 +1,74 @@
+group 'at.ac.tgm.hit.dezsyslabor.hampl'
+version '1.0'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath('org.springframework.boot:spring-boot-gradle-plugin:1.2.0.RELEASE')
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+springBoot {
+    mainClass = 'at.ac.tgm.hit.dezsyslabor.hampl.Application'
+}
+
+dependencies {
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-hornetq'
+    compile group: 'com.h2database', name: 'h2'
+    compile group: 'org.hsqldb', name: 'hsqldb'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-jersey'
+    compile group: 'org.glassfish.jersey.media', name: 'jersey-media-json-jackson'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web'
+    compile group:  'javax.interceptor', name: 'javax.interceptor-api', version: '1.+'
+}
+
+task generateJavadoc(type: Javadoc) {
+    source = sourceSets.main.allJava
+    destinationDir = file("doc/javadoc")
+    classpath = configurations.compile
+    title = "DezSysLabor-12 \"Mobile Chat Application\""
+}
+
+jar {
+    dependsOn generateJavadoc
+    baseName = 'Hampl_Dezsys12'
+    version = '1.0'
+    from sourceSets.main.allSource
+    from(javadoc.destinationDir) {
+        into('doc/javadoc')
+    }
+    from(projectDir) {
+        include 'doc/**'
+        exclude 'doc/*.docx'
+        exclude 'doc/*.odt'
+        exclude 'doc/*.tex'
+    }
+    from('.git') {
+        into('.git')
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.11'
+}
+
+task stage {
+    dependsOn build
+}
+
+compileJava.mustRunAfter clean
